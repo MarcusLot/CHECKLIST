@@ -55,17 +55,10 @@ class ChecklistApp {
         window.addEventListener('beforeunload', () => this.saveToStorage());
     }
 
-    // Criar cards padrão se não existirem
+    // Criar cards padrão se não existirem (removido - app inicia vazio)
     createDefaultCards() {
-        if (this.cards.length === 0) {
-            const defaultCards =
-            [
-
-            ];
-            this.cards = defaultCards;
-            this.renderCards();
-            this.saveToStorage();
-        }
+        // Função removida - app agora inicia vazio
+        // Usuário deve criar seus próprios cards
     }
 
     // Atualizar data atual
