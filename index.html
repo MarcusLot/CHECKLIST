@@ -1,0 +1,199 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Checklist Diário</title>
+    <link rel="stylesheet" href="styles.css">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+</head>
+<body>
+    <div class="container">
+        <header class="header">
+            <div class="header-content">
+                <h1 class="title">
+                    <i class="fas fa-clipboard-check"></i>
+                    Checklist Diário
+                </h1>
+                <div class="date-display">
+                    <i class="fas fa-calendar-day"></i>
+                    <span id="current-date"></span>
+                </div>
+            </div>
+            <div class="header-actions">
+                <button class="action-btn" id="export-btn" title="Exportar dados">
+                    <i class="fas fa-download"></i>
+                </button>
+                <button class="action-btn" id="import-btn" title="Importar dados">
+                    <i class="fas fa-upload"></i>
+                </button>
+                <button class="theme-toggle" id="theme-toggle">
+                    <i class="fas fa-moon"></i>
+                </button>
+            </div>
+            <input type="file" id="import-file" accept=".json" style="display: none;">
+        </header>
+
+        <div class="progress-section">
+            <div class="progress-info">
+                <span class="progress-text">Progresso do dia</span>
+                <span class="progress-stats" id="progress-stats">0 de 0 tarefas</span>
+            </div>
+            <div class="progress-bar">
+                <div class="progress-fill" id="progress-fill"></div>
+            </div>
+            <div class="progress-percentage" id="progress-percentage">0%</div>
+        </div>
+
+        <div class="cards-section">
+            <div class="cards-header">
+                <h2>Seus Períodos do Dia</h2>
+                <div class="cards-actions">
+                    <button id="add-card-btn" class="btn-primary">
+                        <i class="fas fa-plus"></i>
+                        Adicionar Card
+                    </button>
+                    <button id="clear-completed" class="btn-secondary">
+                        <i class="fas fa-trash"></i>
+                        Limpar Concluídas
+                    </button>
+                    <button id="clear-all" class="btn-secondary">
+                        <i class="fas fa-broom"></i>
+                        Limpar Todas
+                    </button>
+                </div>
+            </div>
+            
+            <div class="cards-container" id="cards-container">
+                <div class="empty-state" id="empty-state">
+                    <i class="fas fa-clipboard-list"></i>
+                    <h3>Nenhum card ainda</h3>
+                    <p>Clique em "Adicionar Card" para começar!</p>
+                </div>
+            </div>
+        </div>
+
+        <footer class="footer">
+            <div class="stats">
+                <div class="stat-item">
+                    <span class="stat-label">Total de Tarefas:</span>
+                    <span class="stat-value" id="total-tasks">0</span>
+                </div>
+                <div class="stat-item">
+                    <span class="stat-label">Concluídas:</span>
+                    <span class="stat-value" id="completed-tasks">0</span>
+                </div>
+                <div class="stat-item">
+                    <span class="stat-label">Pendentes:</span>
+                    <span class="stat-value" id="pending-tasks">0</span>
+                </div>
+            </div>
+        </footer>
+    </div>
+
+    <!-- Pop-ups Customizados -->
+    <div class="modal-overlay" id="modal-overlay">
+        <!-- Modal para adicionar/editar card -->
+        <div class="modal" id="card-modal">
+            <div class="modal-header">
+                <h3 id="card-modal-title">Adicionar Card</h3>
+                <button class="modal-close" onclick="app.closeModal()">
+                    <i class="fas fa-times"></i>
+                </button>
+            </div>
+            <div class="modal-body">
+                <div class="form-group">
+                    <label for="card-title-input">Título do Card:</label>
+                    <input type="text" id="card-title-input" placeholder="Ex: MANHÃ, TARDE, NOITE..." maxlength="20">
+                </div>
+                <div class="form-group">
+                    <label for="card-color-select">Cor do Card:</label>
+                    <select id="card-color-select">
+                        <option value="blue">Azul</option>
+                        <option value="green">Verde</option>
+                        <option value="orange">Laranja</option>
+                        <option value="purple">Roxo</option>
+                        <option value="red">Vermelho</option>
+                        <option value="teal">Azul Claro</option>
+                    </select>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button class="btn-secondary" onclick="app.closeModal()">Cancelar</button>
+                <button class="btn-primary" id="save-card-btn">Salvar</button>
+            </div>
+        </div>
+
+        <!-- Modal para adicionar/editar tarefa -->
+        <div class="modal" id="task-modal">
+            <div class="modal-header">
+                <h3 id="task-modal-title">Adicionar Tarefa</h3>
+                <button class="modal-close" onclick="app.closeModal()">
+                    <i class="fas fa-times"></i>
+                </button>
+            </div>
+            <div class="modal-body">
+                <div class="form-group">
+                    <label for="task-text-input">Título da Tarefa:</label>
+                    <input type="text" id="task-text-input" placeholder="Ex: correr, tomar água..." maxlength="50">
+                </div>
+                <div class="form-group">
+                    <label for="task-description-input">Descrição Detalhada (opcional):</label>
+                    <textarea id="task-description-input" placeholder="Ex: Correr 3 km no parque pela manhã, levar garrafa de água..." maxlength="300" rows="3"></textarea>
+                </div>
+                <div class="form-group">
+                    <label for="task-priority-select">Prioridade:</label>
+                    <select id="task-priority-select">
+                        <option value="baixa">Baixa</option>
+                        <option value="media" selected>Média</option>
+                        <option value="alta">Alta</option>
+                    </select>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button class="btn-secondary" onclick="app.closeModal()">Cancelar</button>
+                <button class="btn-primary" id="save-task-btn">Salvar</button>
+            </div>
+        </div>
+
+        <!-- Modal de confirmação -->
+        <div class="modal" id="confirm-modal">
+            <div class="modal-header">
+                <h3 id="confirm-modal-title">Confirmar Ação</h3>
+                <button class="modal-close" onclick="app.closeModal()">
+                    <i class="fas fa-times"></i>
+                </button>
+            </div>
+            <div class="modal-body">
+                <p id="confirm-modal-message">Tem certeza que deseja realizar esta ação?</p>
+            </div>
+            <div class="modal-footer">
+                <button class="btn-secondary" onclick="app.closeModal()">Cancelar</button>
+                <button class="btn-danger" id="confirm-action-btn">Confirmar</button>
+            </div>
+        </div>
+
+        <!-- Modal para visualizar descrição -->
+        <div class="modal" id="description-modal">
+            <div class="modal-header">
+                <h3 id="description-modal-title">Descrição da Tarefa</h3>
+                <button class="modal-close" onclick="app.closeModal()">
+                    <i class="fas fa-times"></i>
+                </button>
+            </div>
+            <div class="modal-body">
+                <div class="task-description-view">
+                    <h4 id="description-task-title"></h4>
+                    <p id="description-task-content"></p>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button class="btn-primary" onclick="app.closeModal()">Fechar</button>
+            </div>
+        </div>
+    </div>
+
+    <script src="script.js"></script>
+</body>
+</html>
