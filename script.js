@@ -58,10 +58,9 @@ class ChecklistApp {
     // Criar cards padrão se não existirem
     createDefaultCards() {
         if (this.cards.length === 0) {
-            const defaultCards = [
-                { id: '1', title: 'MANHÃ', color: 'blue', tasks: [] },
-                { id: '2', title: 'TARDE', color: 'orange', tasks: [] },
-                { id: '3', title: 'NOITE', color: 'purple', tasks: [] }
+            const defaultCards =
+            [
+
             ];
             this.cards = defaultCards;
             this.renderCards();
